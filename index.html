@@ -1,1 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSV Data Cleaning Tool</title>
+    <style>
+        :root {
+            --python-blue: #306998;
+            --python-yellow: #FFD43B;
+            --python-dark-blue: #1c4163;
+            --python-light-yellow: #fffae5;
+            --code-bg: #f0f4f8;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        
+        h1, h2, h3 {
+            color: var(--python-dark-blue);
+        }
+        
+        h1 {
+            border-bottom: 4px solid var(--python-yellow);
+            padding-bottom: 10px;
+        }
+        
+        h2 {
+            border-bottom: 2px solid var(--python-yellow);
+            padding-bottom: 5px;
+        }
+        
+        code {
+            font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+            background-color: var(--code-bg);
+            border-radius: 3px;
+            padding: 2px 4px;
+            color: var(--python-dark-blue);
+        }
+        
+        pre {
+            background-color: var(--code-bg);
+            border-radius: 6px;
+            padding: 16px;
+            overflow: auto;
+            border-left: 4px solid var(--python-blue);
+        }
+        
+        pre code {
+            background-color: transparent;
+            padding: 0;
+        }
+        
+        .csv-example {
+            font-family: monospace;
+            white-space: pre;
+            background-color: var(--python-light-yellow);
+            border: 1px solid var(--python-yellow);
+            padding: 10px;
+            border-radius: 5px;
+        }
+        
+        ul, ol {
+            padding-left: 25px;
+        }
+        
+        li {
+            margin-bottom: 8px;
+        }
+        
+        strong {
+            color: var(--python-dark-blue);
+        }
+        
+        .header-icon {
+            color: var(--python-yellow);
+            margin-right: 8px;
+        }
+        
+        .note {
+            background-color: var(--python-light-yellow);
+            border-left: 4px solid var(--python-yellow);
+            padding: 10px 15px;
+            margin: 15px 0;
+            border-radius: 0 5px 5px 0;
+        }
+        
+        .file-path {
+            font-family: monospace;
+            background-color: var(--code-bg);
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <h1>CSV Data Cleaning Tool</h1>
+    
+    <p>This Python script cleans a CSV file by converting uppercase text to lowercase and removing extra spaces.</p>
+    
+    <h2>Purpose</h2>
+    
+    <p>The script reads a CSV file containing data that may have inconsistent formatting (uppercase text, extra spaces), cleans each cell by converting text to lowercase and normalizing spaces, and then writes the cleaned data to a new CSV file.</p>
+    
+    <h2>Files</h2>
+    
+    <ul>
+        <li><code>dirtyData.csv</code>: (Input) The original CSV file containing data with uppercase text and extra spaces.</li>
+        <li><code>cleanedUp.csv</code>: (Output) A CSV file containing the cleaned data with consistent lowercase formatting and normalized spaces.</li>
+    </ul>
+    
+    <h2>Prerequisites</h2>
+    
+    <ul>
+        <li>Python 3.x installed.</li>
+        <li>Standard libraries: <code>csv</code>, <code>re</code>, and <code>os</code> (all included in standard Python installation).</li>
+    </ul>
+    
+    <h2>How to Use</h2>
+    
+    <ol>
+        <li>
+            <strong>Prepare the Input File:</strong>
+            <ul>
+                <li>Create a CSV file named <code>dirtyData.csv</code> in your target directory, or use an existing CSV file that needs cleaning.</li>
+                <li>Example of dirty data:</li>
+            </ul>
+            <pre class="csv-example">Product NAME,  PRICE,    Category
+APPLE iPhone,    999.99,   ELECTRONICS
+Samsung    GALAXY,   899.99,    Electronics
+SONY   Headphones,  249.99,     AUDIO</pre>
+        </li>
+        <li>
+            <strong>Configure File Paths:</strong>
+            <ul>
+                <li>Edit the <code>file_path</code> variable in the script to point to your directory.</li>
+                <li>By default, the script expects files in:</li>
+            </ul>
+            <div class="file-path">
+                C:\filePATH\Documents\pyScripts\automatedDataCleaning
+            </div>
+        </li>
+        <li>
+            <strong>Run the Script:</strong>
+            <ul>
+                <li>Open a terminal or command prompt.</li>
+                <li>Navigate to the directory containing the Python script.</li>
+                <li>Run the script using the following command:</li>
+            </ul>
+            <pre><code>python csv_cleaner.py</code></pre>
+            <ul>
+                <li>Replace <code>csv_cleaner.py</code> with the actual name of your Python script.</li>
+            </ul>
+        </li>
+    </ol>
+    
+    <h3>Code:</h3>
+    
+    <pre><code>import csv
+import re
+import os
 
+def clean_csv_data(input_filepath, output_filepath):
+    """
+    Cleans a CSV file by converting uppercase words to lowercase and removing extra spaces.
+    Args:
+        input_filepath (str): The path to the input CSV file.
+        output_filepath (str): The path to save the cleaned CSV file.
+    """
+    try:
+        with open(input_filepath, 'r', newline='', encoding='utf-8') as infile, \
+             open(output_filepath, 'w', newline='', encoding='utf-8') as outfile:
+            reader = csv.reader(infile)
+            writer = csv.writer(outfile)
+            for row in reader:
+                cleaned_row = []
+                for cell in row:
+                    # Remove leading/trailing spaces and replace multiple spaces with single spaces
+                    cleaned_cell = re.sub(r'\s+', ' ', cell.strip()).lower()
+                    cleaned_row.append(cleaned_cell)
+                writer.writerow(cleaned_row)
+        print(f"Cleaned data saved to: {output_filepath}")
+    except FileNotFoundError:
+        print(f"Error: Input file not found at {input_filepath}")
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
+
+if __name__ == "__main__":
+    file_path = r"C:\filePATH\Documents\pyScripts\automatedDataCleaning"
+    input_file = os.path.join(file_path, "dirtyData.csv")
+    output_file = os.path.join(file_path, "cleanedUp.csv")
+    clean_csv_data(input_file, output_file)</code></pre>
+    
+    <ol start="4">
+        <li>
+            <strong>Check the Output File:</strong>
+            <ul>
+                <li>The script will create a CSV file named <code>cleanedUp.csv</code> in the specified directory.</li>
+                <li>Open this file to verify the cleaned data.</li>
+                <li>Example of cleaned data:</li>
+            </ul>
+            <pre class="csv-example">product name,price,category
+apple iphone,999.99,electronics
+samsung galaxy,899.99,electronics
+sony headphones,249.99,audio</pre>
+        </li>
+    </ol>
+    
+    <div class="note">
+        <strong>Tip:</strong> Make sure to verify your file paths before running the script. The paths shown are examples and need to be updated to match your system's directory structure.
+    </div>
+    
+    <h2>Script Details</h2>
+    
+    <p>The script performs the following cleaning operations:</p>
+    
+    <ol>
+        <li>Removes leading and trailing whitespace from each cell.</li>
+        <li>Replaces multiple consecutive spaces with a single space.</li>
+        <li>Converts all text to lowercase for consistency.</li>
+    </ol>
+    
+    <p>These cleaning operations help standardize the data format, making it easier to analyze or process the data further.</p>
+    
+    <h2>Modifications</h2>
+    
+    <ul>
+        <li>
+            <p>To change the input and output file paths, modify the following variables at the end of the script:</p>
+            <div class="file-path">
+                file_path = r"C:\filePATH\Documents\pyScripts\automatedDataCleaning"<br>
+                input_file = os.path.join(file_path, "dirtyData.csv")<br>
+                output_file = os.path.join(file_path, "cleanedUp.csv")
+            </div>
+        </li>
+        <li>
+            <p>To modify the cleaning logic, change the regular expression or add additional transformations in the following line:</p>
+            <pre><code>cleaned_cell = re.sub(r'\s+', ' ', cell.strip()).lower()</code></pre>
+        </li>
+        <li>
+            <p>For example, to preserve case but still clean spaces:</p>
+            <pre><code># Remove the .lower() part
+cleaned_cell = re.sub(r'\s+', ' ', cell.strip())</code></pre>
+        </li>
+    </ul>
+    
+    <h2>Error Handling</h2>
+    
+    <p>The script includes error handling for common issues:</p>
+    
+    <ul>
+        <li>FileNotFoundError: If the input file doesn't exist at the specified path.</li>
+        <li>General exceptions: Any other unexpected errors during execution.</li>
+    </ul>
+    
+    <p>Error messages are printed to the console to help diagnose issues.</p>
+</body>
+</html>
